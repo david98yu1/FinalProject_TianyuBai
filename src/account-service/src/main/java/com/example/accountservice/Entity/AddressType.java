@@ -1,3 +1,3 @@
-package com.example.accountservice.Entity;
+package com.example.accountservice.entity;
 
 public enum AddressType { SHIPPING, BILLING }

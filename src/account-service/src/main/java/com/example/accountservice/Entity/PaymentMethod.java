@@ -1,12 +1,14 @@
-package com.example.accountservice.Entity;
+package com.example.accountservice.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PaymentMethod {
 
     @Id
@@ -14,8 +16,7 @@ public class PaymentMethod {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "account_id", nullable = false,
-            foreignKey = @ForeignKey(name = "fk_pm_account"))
+    @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 
     @Column(nullable = false, length = 20)
