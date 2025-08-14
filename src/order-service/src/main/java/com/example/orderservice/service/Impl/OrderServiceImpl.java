@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.NoSuchElementException;
 
 @Service
 @Transactional
@@ -64,7 +65,7 @@ public class OrderServiceImpl implements OrderService {
                     .retrieve().toBodilessEntity().block();
         }
 
-        order.setStatus(OrderStatus.CONFIRMED);
+        order.setStatus(OrderStatus.PENDING);
         return toResponse(order);
     }
 
@@ -87,6 +88,14 @@ public class OrderServiceImpl implements OrderService {
                     .retrieve().toBodilessEntity().block();
         }
         o.setStatus(OrderStatus.CANCELED);
+        return toResponse(o);
+    }
+
+    @Override
+    public OrderResponse confirm(Long id) {
+        var o = orderRepo.findById(id).orElseThrow(() -> new NoSuchElementException("order not found"));
+        if (o.getStatus() != OrderStatus.PENDING) return toResponse(o);
+        o.setStatus(OrderStatus.CONFIRMED);
         return toResponse(o);
     }
 

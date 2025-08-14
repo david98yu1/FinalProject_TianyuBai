@@ -22,5 +22,8 @@ public class OrderController {
 
     @PostMapping("/{id}/cancel")
     public OrderResponse cancel(@PathVariable Long id) { return service.cancel(id); }
+
+    @PostMapping("/{id}/confirm")
+    public OrderResponse confirm(@PathVariable Long id) { return service.confirm(id); }
 }
 
