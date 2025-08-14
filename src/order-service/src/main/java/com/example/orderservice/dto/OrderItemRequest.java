@@ -1,5 +1,5 @@
-package com.example.accountservice.dto;
-
+// OrderItemRequest.java
+package com.example.orderservice.dto;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,9 +8,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class UpdateAccountRequest{
-    @NotBlank @Email String email;
-    @NotBlank @Size(min = 2, max = 50) String username;
+@NoArgsConstructor
+public class OrderItemRequest {
+    @NotBlank private String sku;
+    @Min(1) private int quantity;
 }
