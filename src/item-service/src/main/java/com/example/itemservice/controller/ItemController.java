@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
+import com.example.commonlib.dto.item.ItemDto;
+import com.example.commonlib.dto.item.InventoryAdjustRequest;
 
 @RestController
 @RequestMapping("/items")
@@ -17,7 +19,7 @@ public class ItemController {
 
     @PostMapping
     @ResponseStatus(org.springframework.http.HttpStatus.CREATED)
-    public ItemResponse create(@Valid @RequestBody CreateItemRequest req) {
+    public ItemResponse create(@Valid @RequestBody ItemDto req) {
         return service.create(req);
     }
 
@@ -46,7 +48,7 @@ public class ItemController {
     }
 
     @PostMapping("/{id}/inventory/adjust")
-    public ItemResponse adjust(@PathVariable String id, @Valid @RequestBody AdjustStockRequest req) {
+    public ItemResponse adjust(@PathVariable String id, @Valid @RequestBody InventoryAdjustRequest req) {
         return service.adjustStock(id, req.getDelta());
     }
 }

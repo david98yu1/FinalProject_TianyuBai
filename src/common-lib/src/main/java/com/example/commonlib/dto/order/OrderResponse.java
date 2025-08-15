@@ -1,5 +1,5 @@
 // OrderResponse.java  (simplified)
-package com.example.orderservice.dto;
+package com.example.commonlib.dto.order;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

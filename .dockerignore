@@ -1,0 +1,9 @@
+target
+**/target
+.git
+.gitignore
+.idea
+*.iml
+node_modules
+Dockerfile
+**/*.md

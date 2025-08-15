@@ -1,7 +1,7 @@
 package com.example.orderservice.controller;
 
 import com.example.orderservice.dto.CreateOrderRequest;
-import com.example.orderservice.dto.OrderResponse;
+import com.example.commonlib.dto.order.OrderResponse;
 import com.example.orderservice.service.OrderService;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,0 +1,143 @@
+services:
+  mysql:
+    image: mysql:8.4
+    platform: linux/arm64/v8
+    container_name: shop-mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    command:
+      --sql-mode=''
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-proot" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  mongo:
+    image: mongodb/mongodb-community-server:7.0-ubi8
+    container_name: shop-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./docker/mongo/init.js:/docker-entrypoint-initdb.d/init.js:ro
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  auth-service:
+    build:
+      context: ./src/auth-service
+    container_name: auth-service
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SERVER_PORT: 9000
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/auth_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      APP_JWT_SECRET: 0d3bf2a4d3f94f44b7e06a3b8c2a9f7e0d3bf2a4d3f94f44b7e06a3b8c2a9f7e
+      # CORS for React dev (optional if you add a CorsConfiguration bean)
+      # ALLOWED_ORIGINS: http://localhost:5173
+    ports:
+      - "9000:9000"
+
+  account-service:
+    build:
+      context: ./src/account-service
+    container_name: account-service
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SERVER_PORT: 9001
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/account_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      APP_JWT_SECRET: 0d3bf2a4d3f94f44b7e06a3b8c2a9f7e0d3bf2a4d3f94f44b7e06a3b8c2a9f7e
+    ports:
+      - "9001:9001"
+
+  item-service:
+    build:
+      context: ./src/item-service
+    container_name: item-service
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      SERVER_PORT: 9002
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/item_db
+      APP_JWT_SECRET: 0d3bf2a4d3f94f44b7e06a3b8c2a9f7e0d3bf2a4d3f94f44b7e06a3b8c2a9f7e
+    ports:
+      - "9002:9002"
+
+  order-service:
+    build:
+      context: ./src/order-service
+    container_name: order-service
+    depends_on:
+      mysql:
+        condition: service_healthy
+      item-service:
+        condition: service_started
+      auth-service:
+        condition: service_started
+    environment:
+      SERVER_PORT: 9003
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/order_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      APP_JWT_SECRET: 0d3bf2a4d3f94f44b7e06a3b8c2a9f7e0d3bf2a4d3f94f44b7e06a3b8c2a9f7e
+
+      # Feign base URLs (use compose DNS names)
+      ITEM_SERVICE_BASE_URL: http://item-service:9002
+      AUTH_SERVICE_BASE_URL: http://auth-service:9000
+
+      # Order-bot service-to-service login for token provider
+      SERVICE_USER: order-bot
+      SERVICE_PASS: order-bot
+    ports:
+      - "9003:9003"
+
+  payment-service:
+    build:
+      context: ./src/payment-service
+    container_name: payment-service
+    depends_on:
+      mysql:
+        condition: service_healthy
+      order-service:
+        condition: service_started
+      auth-service:
+        condition: service_started
+    environment:
+      SERVER_PORT: 9004
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/payment_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      APP_JWT_SECRET: 0d3bf2a4d3f94f44b7e06a3b8c2a9f7e0d3bf2a4d3f94f44b7e06a3b8c2a9f7e
+
+      # Feign base URLs
+      ORDER_SERVICE_BASE_URL: http://order-service:9003
+      AUTH_SERVICE_BASE_URL: http://auth-service:9000
+
+      # Payment-bot credentials
+      SERVICE_USER: payment-bot
+      SERVICE_PASS: payment-bot
+    ports:
+      - "9004:9004"
+
+volumes:
+  mysql_data:

@@ -2,7 +2,7 @@ package com.example.orderservice.service;
 
 
 import com.example.orderservice.dto.CreateOrderRequest;
-import com.example.orderservice.dto.OrderResponse;
+import com.example.commonlib.dto.order.OrderResponse;
 
 public interface OrderService {
     OrderResponse create(CreateOrderRequest req);

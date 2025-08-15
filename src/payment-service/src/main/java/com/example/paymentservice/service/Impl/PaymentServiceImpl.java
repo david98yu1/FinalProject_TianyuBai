@@ -1,12 +1,13 @@
 package com.example.paymentservice.service.Impl;
 
-import com.example.paymentservice.client.OrderClient;
-import com.example.paymentservice.client.OrderView;
+import com.example.paymentservice.client.OrderFeignClient;
 import com.example.paymentservice.dto.CreatePaymentRequest;
 import com.example.paymentservice.dto.PaymentResponse;
-import com.example.paymentservice.entity.*;
+import com.example.paymentservice.entity.Payment;
+import com.example.paymentservice.entity.PaymentStatus;
 import com.example.paymentservice.repository.PaymentRepository;
 import com.example.paymentservice.service.PaymentService;
+import com.example.commonlib.dto.order.OrderResponse; // use your local DTO (or swap to common-lib if you moved it)
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,22 +21,22 @@ import java.util.UUID;
 public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository repo;
-    private final OrderClient orderClient;
+    private final OrderFeignClient orderClient;
 
     @Override
     public PaymentResponse pay(CreatePaymentRequest req) {
         // 1) Read order to validate amount
-        OrderView order = orderClient.getOrder(req.getOrderId());
+        OrderResponse order = orderClient.get(req.getOrderId());
         if (order == null) throw new IllegalArgumentException("order not found: " + req.getOrderId());
 
         // Compare amounts
-        if (order.total == null || req.getAmount().compareTo(order.total) != 0) {
+        if (order.getTotal() == null || req.getAmount().compareTo(order.getTotal()) != 0) {
             throw new IllegalArgumentException("amount mismatch");
         }
 
         // 2) Create INITIATED payment
         Payment p = Payment.builder()
-                .orderId(order.id)
+                .orderId(order.getId())
                 .amount(req.getAmount())
                 .status(PaymentStatus.INITIATED)
                 .build();
@@ -48,19 +49,18 @@ public class PaymentServiceImpl implements PaymentService {
         if (success) {
             p.setStatus(PaymentStatus.CAPTURED);
             p.setProviderTxnId("txn_" + UUID.randomUUID());
-            // Optional: if your Order stays PENDING until payment, you would call a /confirm endpoint here.
-            orderClient.confirmOrder(order.id);
+            orderClient.confirm(order.getId());
             return toResp(repo.save(p));
         } else {
             p.setStatus(PaymentStatus.FAILED);
             repo.save(p);
-            // Compensate: cancel the order (your cancel already restocks)
-            orderClient.cancelOrder(order.id);
+            orderClient.confirm(order.getId());
             return toResp(p);
         }
     }
 
-    @Override @Transactional(readOnly = true)
+    @Override
+    @Transactional(readOnly = true)
     public PaymentResponse get(Long id) {
         Payment p = repo.findById(id).orElseThrow(() -> new java.util.NoSuchElementException("payment not found"));
         return toResp(p);

@@ -1,6 +1,5 @@
 package com.example.itemservice.service.Impl;
 
-import com.example.itemservice.dto.CreateItemRequest;
 import com.example.itemservice.dto.ItemResponse;
 import com.example.itemservice.dto.UpdateItemRequest;
 import com.example.itemservice.entity.Item;
@@ -14,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
+
+import com.example.commonlib.dto.item.ItemDto;
 
 @Transactional
 @Service
@@ -29,7 +30,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemResponse create(CreateItemRequest req) {
+    public ItemResponse create(ItemDto req) {
         repo.findBySku(req.getSku()).ifPresent(item -> { throw new IllegalArgumentException("sku already exists"); });
         Item item = Item.builder().sku(req.getSku())
                 .name(req.getName())
