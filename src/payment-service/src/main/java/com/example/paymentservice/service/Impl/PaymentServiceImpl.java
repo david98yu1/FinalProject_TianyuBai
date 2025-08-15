@@ -25,7 +25,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentResponse pay(CreatePaymentRequest req) {
-        // 1) Read order to validate amount
+        // Read order to validate amount
         OrderResponse order = orderClient.get(req.getOrderId());
         if (order == null) throw new IllegalArgumentException("order not found: " + req.getOrderId());
 
@@ -34,7 +34,7 @@ public class PaymentServiceImpl implements PaymentService {
             throw new IllegalArgumentException("amount mismatch");
         }
 
-        // 2) Create INITIATED payment
+        // Create INITIATED payment
         Payment p = Payment.builder()
                 .orderId(order.getId())
                 .amount(req.getAmount())
@@ -42,8 +42,8 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
         p = repo.save(p);
 
-        // 3) Simulate processor (deterministic demo rule):
-        //    fail if amount (in cents) is divisible by 7; else succeed.
+        // Simulate processor (deterministic demo rule):
+        // fail if amount (in cents) is divisible by 7; else succeed.
         boolean success = req.getAmount().movePointRight(2).remainder(BigDecimal.valueOf(7)).intValue() != 0;
 
         if (success) {

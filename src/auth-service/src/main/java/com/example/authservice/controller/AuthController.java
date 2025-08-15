@@ -4,6 +4,7 @@ import com.example.authservice.dto.*;
 import com.example.authservice.entity.User;
 import com.example.authservice.repository.UserRepository;
 import com.example.authservice.security.JwtService;
+import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ public class AuthController {
     private final PasswordEncoder encoder;
     private final JwtService jwt;
 
+    @PermitAll
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public AuthResponse register(@Valid @RequestBody RegisterRequest r) {
@@ -40,6 +42,7 @@ public class AuthController {
         return new AuthResponse(token, Instant.now().plusMillis(3600000));
     }
 
+    @PermitAll
     @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody LoginRequest r) {
         User u = users.findByEmail(r.getLogin())
@@ -50,6 +53,7 @@ public class AuthController {
             throw new IllegalArgumentException("invalid credentials");
 
         String token = jwt.generate(u.getId(), u.getUsername(), u.getRoles());
+        System.out.println("Login detected");
         return new AuthResponse(token, Instant.now().plusMillis(3600000));
     }
 }

@@ -11,17 +11,17 @@ import java.util.List;
 @Getter
 @Setter
 @Document("items")
-@NoArgsConstructor                 // () -> new Item()
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Item {
-    @Id private String id;          // Mongo ObjectId as String is fine
+    @Id private String id;          // Mongo ObjectId as String
     @Indexed(unique = true) private String sku;
     @Indexed private String name;
     private String description;
     private List<String> categories;
-    private BigDecimal price;       // use BigDecimal for money
-    private int stock;              // on-hand quantity
+    private BigDecimal price;       // BigDecimal for money
+    private int stock;
     private boolean active;         // for soft-hiding
     private String pictureUrl;
 }

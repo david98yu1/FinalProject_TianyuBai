@@ -33,16 +33,18 @@ services:
 
   auth-service:
     build:
-      context: ./src/auth-service
+      context: .
+      dockerfile: src/auth-service/Dockerfile
     container_name: auth-service
     depends_on:
       mysql:
         condition: service_healthy
     environment:
       SERVER_PORT: 9000
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/auth_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_DATASOURCE_USERNAME: shop
+      SPRING_DATASOURCE_PASSWORD: shop
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       APP_JWT_SECRET: 0d3bf2a4d3f94f44b7e06a3b8c2a9f7e0d3bf2a4d3f94f44b7e06a3b8c2a9f7e
       # CORS for React dev (optional if you add a CorsConfiguration bean)
@@ -52,16 +54,18 @@ services:
 
   account-service:
     build:
-      context: ./src/account-service
+      context: .
+      dockerfile: src/account-service/Dockerfile
     container_name: account-service
     depends_on:
       mysql:
         condition: service_healthy
     environment:
       SERVER_PORT: 9001
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/account_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_DATASOURCE_USERNAME: shop
+      SPRING_DATASOURCE_PASSWORD: shop
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       APP_JWT_SECRET: 0d3bf2a4d3f94f44b7e06a3b8c2a9f7e0d3bf2a4d3f94f44b7e06a3b8c2a9f7e
     ports:
@@ -69,13 +73,15 @@ services:
 
   item-service:
     build:
-      context: ./src/item-service
+      context: .
+      dockerfile: src/item-service/Dockerfile
     container_name: item-service
     depends_on:
       mongo:
         condition: service_healthy
     environment:
       SERVER_PORT: 9002
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
       SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/item_db
       APP_JWT_SECRET: 0d3bf2a4d3f94f44b7e06a3b8c2a9f7e0d3bf2a4d3f94f44b7e06a3b8c2a9f7e
     ports:
@@ -83,7 +89,8 @@ services:
 
   order-service:
     build:
-      context: ./src/order-service
+      context: .
+      dockerfile: src/order-service/Dockerfile
     container_name: order-service
     depends_on:
       mysql:
@@ -94,9 +101,10 @@ services:
         condition: service_started
     environment:
       SERVER_PORT: 9003
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/order_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_DATASOURCE_USERNAME: shop
+      SPRING_DATASOURCE_PASSWORD: shop
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       APP_JWT_SECRET: 0d3bf2a4d3f94f44b7e06a3b8c2a9f7e0d3bf2a4d3f94f44b7e06a3b8c2a9f7e
 
@@ -112,7 +120,8 @@ services:
 
   payment-service:
     build:
-      context: ./src/payment-service
+      context: .
+      dockerfile: src/payment-service/Dockerfile
     container_name: payment-service
     depends_on:
       mysql:
@@ -123,9 +132,10 @@ services:
         condition: service_started
     environment:
       SERVER_PORT: 9004
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/payment_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_DATASOURCE_USERNAME: shop
+      SPRING_DATASOURCE_PASSWORD: shop
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       APP_JWT_SECRET: 0d3bf2a4d3f94f44b7e06a3b8c2a9f7e0d3bf2a4d3f94f44b7e06a3b8c2a9f7e
 

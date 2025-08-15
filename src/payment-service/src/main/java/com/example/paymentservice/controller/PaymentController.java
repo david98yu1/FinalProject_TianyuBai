@@ -16,6 +16,7 @@ public class PaymentController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public PaymentResponse pay(@Valid @RequestBody CreatePaymentRequest req) {
+        System.out.println("paying order #" + req.getOrderId());
         return service.pay(req);
     }
 

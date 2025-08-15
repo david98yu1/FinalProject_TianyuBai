@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -42,8 +43,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     public java.util.List<AddressDto> addAddress(Long accountId, AddressRequest req) {
-        var acc = accountRepo.findById(accountId).orElseThrow(() -> new NoSuchElementException("account not found"));
-        var address = Address.builder()
+        var acc = accountRepo.findByAuthUserId(String.valueOf(accountId)).orElseThrow(() -> new NoSuchElementException("account not found"));
+        System.out.println(acc.getUsername());
+        var address = Address.builder().authUserId(acc.getAuthUserId())
                 .account(acc).type(req.getType()).line1(req.getLine1()).line2(req.getLine2())
                 .city(req.getCity()).state(req.getState()).zip(req.getZip()).country(req.getCountry())
                 .isDefault(req.isDefault()).build();
@@ -63,5 +65,34 @@ public class AccountServiceImpl implements AccountService {
         return pmRepo.findByAccountId(accountId).stream()
                 .map(x -> modelMapper.map(x, PaymentMethodDto.class))
                 .toList();
+    }
+
+    @Override
+    public AccountResponse createIfAbsent(String authUserId, String email, String username) {
+        // If an account already exists for this auth user, just return it (idempotent).
+        var existing = accountRepo.findByAuthUserId(authUserId);
+        if (existing.isPresent()) {
+            return modelMapper.map(existing.get(), AccountResponse.class);
+        }
+
+        // Enforce unique email when creating the first time.
+        if (accountRepo.existsByEmail(email)) {
+            throw new IllegalArgumentException("email already exists");
+        }
+
+        var acc = Account.builder()
+                .authUserId(authUserId)
+                .email(email)
+                .username(username)
+                .build();
+
+        var saved = accountRepo.save(acc);
+        return modelMapper.map(saved, AccountResponse.class);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Account> findByAuthUserId(String authUserId) {
+        return accountRepo.findByAuthUserId(authUserId);
     }
 }

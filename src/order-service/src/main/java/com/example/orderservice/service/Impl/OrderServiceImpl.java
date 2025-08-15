@@ -52,7 +52,8 @@ public class OrderServiceImpl implements OrderService {
 
             ItemDto item = itemClient.getBySku(sku);
 
-            if (item.isActive()) throw new IllegalArgumentException("item not available: " + r.getSku());
+            // System.out.println(item.isActive());
+            if (!item.isActive()) throw new IllegalArgumentException("item not available: " + r.getSku());
             if (item.getStock() < r.getQuantity()) throw new IllegalArgumentException("insufficient stock: " + r.getSku());
 
             var lineTotal = item.getPrice().multiply(java.math.BigDecimal.valueOf(r.getQuantity()));

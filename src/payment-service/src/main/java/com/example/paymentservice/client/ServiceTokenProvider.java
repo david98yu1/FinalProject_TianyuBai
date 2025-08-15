@@ -20,7 +20,7 @@ public class ServiceTokenProvider {
     private final AtomicReference<String> tokenRef = new AtomicReference<>();
     private final AtomicReference<Instant> expRef   = new AtomicReference<>(Instant.EPOCH);
 
-    /** Get a valid token (refreshes if missing/expiring soon). */
+    // Get a valid token (refreshes if missing/expiring soon).
     public String get() {
         if (isExpiringSoon()) {
             refresh();
@@ -28,7 +28,7 @@ public class ServiceTokenProvider {
         return tokenRef.get();
     }
 
-    /** Force refresh by logging in to auth-service. */
+    // Force refresh by logging in to auth-service.
     public synchronized String refresh() {
         AuthResponse resp = authClient.login(new LoginRequest(user, pass));
         if (resp == null || resp.getToken() == null || resp.getToken().isBlank()) {

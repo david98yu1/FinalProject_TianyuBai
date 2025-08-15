@@ -4,7 +4,6 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<!-- Parent is the ROOT aggregator, NOT this module -->
 	<parent>
 		<groupId>com.example</groupId>
 		<artifactId>FinalProject_TianyuBai</artifactId>
@@ -17,11 +16,10 @@
 	<name>common-lib</name>
 
 	<dependencies>
-		<!-- DTOs only; Lombok is provided (no runtime) -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.32</version>
+			<version>1.18.34</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -56,5 +54,4 @@
 		</dependency>
 	</dependencies>
 
-	<!-- DO NOT put spring-boot-maven-plugin here; this is a plain jar -->
 </project>

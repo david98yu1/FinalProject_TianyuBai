@@ -14,6 +14,8 @@ public class OrderController {
     @PostMapping
     @ResponseStatus(org.springframework.http.HttpStatus.CREATED)
     public OrderResponse create(@jakarta.validation.Valid @RequestBody CreateOrderRequest req) {
+        System.out.println(req.getAccountId());
+        System.out.println(req.getItems().size());
         return service.create(req);
     }
 
