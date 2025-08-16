@@ -37,5 +37,6 @@
         <module>src/item-service</module>
         <module>src/order-service</module>
         <module>src/payment-service</module>
+        <module>src/event-store-service</module>
     </modules>
 </project>

@@ -1,0 +1,14 @@
+services:
+  redpanda:
+    image: redpandadata/redpanda:v24.1.8
+    container_name: redpanda
+    command:
+      - redpanda start --mode dev-container --overprovisioned --smp 1 --memory 512M --reserve 0M
+    ports:
+      - "9092:9092"   # Kafka API
+      - "9644:9644"   # Admin API
+    healthcheck:
+      test: ["CMD", "bash", "-c", "rpk cluster info -X brokers=localhost:9092 >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 3s
+      retries: 30

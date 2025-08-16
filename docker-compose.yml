@@ -40,6 +40,9 @@ services:
       mysql:
         condition: service_healthy
     environment:
+      SERVER_ADDRESS: 0.0.0.0
+      SPRING_MVC_SERVLET_PATH:
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info,mappings
       SERVER_PORT: 9000
       SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/auth_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
@@ -47,8 +50,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: shop
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       APP_JWT_SECRET: 0d3bf2a4d3f94f44b7e06a3b8c2a9f7e0d3bf2a4d3f94f44b7e06a3b8c2a9f7e
-      # CORS for React dev (optional if you add a CorsConfiguration bean)
-      # ALLOWED_ORIGINS: http://localhost:5173
+      ACCOUNT_SERVICE_URL: http://account-service:9001
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: DEBUG
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY: DEBUG
     ports:
       - "9000:9000"
 
@@ -151,3 +155,5 @@ services:
 
 volumes:
   mysql_data:
+
+
