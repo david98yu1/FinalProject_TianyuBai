@@ -25,12 +25,6 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepo;
     private final ItemFeignClient itemClient;
 
-    // Minimal shape matching Item Service response
-    static class ItemResp {
-        public String id, sku, name, pictureUrl;
-        public java.math.BigDecimal price; public int stock; public boolean active;
-    }
-
     @Override
     public OrderResponse create(CreateOrderRequest req) {
         if (req == null || req.getItems() == null || req.getItems().isEmpty()) {

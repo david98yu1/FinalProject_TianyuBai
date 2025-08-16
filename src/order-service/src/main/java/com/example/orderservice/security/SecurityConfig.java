@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -17,11 +18,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/orders").authenticated()          // create requires login
+                        .requestMatchers(HttpMethod.POST, "/orders").permitAll()
+                        //.requestMatchers(HttpMethod.POST, "/orders").authenticated()          // create requires login
                         .requestMatchers(HttpMethod.POST, "/orders/*/confirm").hasAnyRole("PAYMENT","ADMIN")
                         .requestMatchers(HttpMethod.POST, "/orders/*/cancel").authenticated()
                         .requestMatchers(HttpMethod.GET, "/orders/**").authenticated()            // or require auth if you prefer

@@ -42,9 +42,8 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
         p = repo.save(p);
 
-        // Simulate processor (deterministic demo rule):
-        // fail if amount (in cents) is divisible by 7; else succeed.
-        boolean success = req.getAmount().movePointRight(2).remainder(BigDecimal.valueOf(7)).intValue() != 0;
+
+        boolean success = true; // real life logic will be provided by payment api company
 
         if (success) {
             p.setStatus(PaymentStatus.CAPTURED);

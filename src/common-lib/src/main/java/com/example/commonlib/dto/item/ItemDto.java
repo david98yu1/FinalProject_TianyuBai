@@ -25,7 +25,8 @@ public class ItemDto {
     @DecimalMin(value = "0.00")
     BigDecimal price;
     @Min(0) int stock;
-    boolean active;
+    boolean active = true;
     String url;
     String pictureUrl;
+    // @Version private Long version;
 }
